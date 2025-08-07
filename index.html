@@ -605,27 +605,25 @@
       // Save form data (optional)
       sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
 
-      // Build Wert.io Widget URL
+      // Build Wert.io Widget URL (Fiat On-Ramp - No commodity/network needed)
       const wertUrl = new URL('https://sandbox.wert.io/widget');
 
-      // Required Parameters
-      wertUrl.searchParams.append('partner_id', '01K0FHM9K6ATK1CYCHMV34Z0YG');
-      wertUrl.searchParams.append('origin', window.location.origin);
-      wertUrl.searchParams.append('amount', data.amount);
-      wertUrl.searchParams.append('currency', 'USD');
-      wertUrl.searchParams.append('commodity', 'ETH');
+// Required Parameters
+wertUrl.searchParams.append('partner_id', '01K0FHM9K6ATK1CYCHMV34Z0YG');
+wertUrl.searchParams.append('origin', window.location.origin);
+wertUrl.searchParams.append('amount', data.amount);
+wertUrl.searchParams.append('currency', 'USD');
+wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
+wertUrl.searchParams.append('brand_color', '#fa0a0a');
+
+// Optional: Pass your form data
+wertUrl.searchParams.append('metadata[game]', data.game);
+wertUrl.searchParams.append('metadata[username]', data.username);
+wertUrl.searchParams.append('metadata[name]', data.name);
+wertUrl.searchParams.append('metadata[email]', data.email);
+wertUrl.searchParams.append('metadata[phone]', data.phone);
+
       
-      // Use sepolia testnet (you can switch to amoy if needed)
-      wertUrl.searchParams.append('network', 'sepolia');
-      wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
-
-      // Optional: Pass user & game data into metadata (visible in Wert.io dashboard)
-      wertUrl.searchParams.append('metadata[game]', data.game);
-      wertUrl.searchParams.append('metadata[username]', data.username);
-      wertUrl.searchParams.append('metadata[name]', data.name);
-      wertUrl.searchParams.append('metadata[email]', data.email);
-      wertUrl.searchParams.append('metadata[phone]', data.phone);
-
       // Optional: Set brand color
       wertUrl.searchParams.append('brand_color', '#fa0a0a');
 
