@@ -596,43 +596,39 @@
     });
     gameSelect.value = games[0].name; // Default to first game
 
-    // === Handle Deposit Form ===
-    document.getElementById('depositForm').onsubmit = function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      const data = Object.fromEntries(formData);
+   // === Handle Deposit Form ===
+document.getElementById('depositForm').onsubmit = function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData);
 
-      // Save form data (optional)
-      sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
+  // Save form data (optional)
+  sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
 
-      // Build Wert.io Widget URL (Fiat On-Ramp - No commodity/network needed)
-      const wertUrl = new URL('https://wert.io/widget');
+  // Build WERT.IO PRODUCTION Widget URL
+  const wertUrl = new URL('https://wert.io/widget'); // ✅ Production URL
 
-// Required Parameters
-wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF');
-wertUrl.searchParams.append('origin', window.location.origin);
-wertUrl.searchParams.append('amount', data.amount);
-wertUrl.searchParams.append('currency', 'USD');
-wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
-wertUrl.searchParams.append('brand_color', '#fa0a0a');
+  // Required Parameters
+  wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF'); // ✅ Production Partner ID
+  wertUrl.searchParams.append('origin', window.location.origin);
+  wertUrl.searchParams.append('amount', data.amount);
+  wertUrl.searchParams.append('currency', 'USD');
+  wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
+  wertUrl.searchParams.append('brand_color', '#fa0a0a');
 
-// Optional: Pass your form data
-wertUrl.searchParams.append('metadata[game]', data.game);
-wertUrl.searchParams.append('metadata[username]', data.username);
-wertUrl.searchParams.append('metadata[name]', data.name);
-wertUrl.searchParams.append('metadata[email]', data.email);
-wertUrl.searchParams.append('metadata[phone]', data.phone);
+  // Optional: Pass metadata (shows in your dashboard)
+  wertUrl.searchParams.append('metadata[game]', data.game);
+  wertUrl.searchParams.append('metadata[username]', data.username);
+  wertUrl.searchParams.append('metadata[name]', data.name);
+  wertUrl.searchParams.append('metadata[email]', data.email);
+  wertUrl.searchParams.append('metadata[phone]', data.phone);
 
-      
-      // Optional: Set brand color
-      wertUrl.searchParams.append('brand_color', '#fa0a0a');
+  // Open Wert.io in new tab
+  window.open(wertUrl, '_blank');
 
-      // Open Wert.io in new tab
-      window.open(wertUrl, '_blank');
-
-      // Close modal
-      document.getElementById('depositModal').style.display = 'none';
-    };
+  // Close modal
+  document.getElementById('depositModal').style.display = 'none';
+};
   </script>
 </body>
 </html>
