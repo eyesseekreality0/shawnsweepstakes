@@ -610,7 +610,7 @@
 
 // Required Parameters
 wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF');
-wertUrl.searchParams.append('origin', window.location.origin);
+wertUrl.searchParams.append('origin', 'https://widget.wert.io');
 wertUrl.searchParams.append('amount', data.amount);
 wertUrl.searchParams.append('currency', 'USD');
 wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
@@ -624,8 +624,6 @@ wertUrl.searchParams.append('metadata[email]', data.email);
 wertUrl.searchParams.append('metadata[phone]', data.phone);
 
       
-      // Optional: Set brand color
-      wertUrl.searchParams.append('brand_color', '#fa0a0a');
 
       // Open Wert.io in new tab
       window.open(wertUrl, '_blank');
