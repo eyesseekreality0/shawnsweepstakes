@@ -5,208 +5,205 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ShawnSweeps</title>
   <style>
-  /* === Reset & Scroll Fix === */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body, html {
-    width: 100%;
-    min-height: 100vh; /* Not just 100% — allows scrolling */
-    overflow-x: hidden;
-    overflow-y: auto; /* Enable vertical scroll */
-    font-family: Arial, sans-serif;
-    color: white;
-    position: relative;
-  }
-
-  /* === Video Background (Fixed, Full Screen) === */
-  #bg-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -2;
-    pointer-events: none;
-  }
-  .video-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: -1;
-  }
-
-  /* === Header & Logo === */
-  header {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    text-align: center;
-    z-index: 10;
-    position: relative;
-  }
-  header img {
-    width: 220px;
-    filter: drop-shadow(0 0 10px rgba(250, 10, 10, 0.6));
-  }
-
-  /* === Deposit Button === */
-  .deposit-top {
-    display: block;
-    width: 90%;
-    max-width: 400px;
-    margin: 0 auto 40px auto;
-    padding: 16px;
-    background: #fa0a0a;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 17px;
-    cursor: pointer;
-    box-shadow: 0 6px 15px rgba(250, 10, 10, 0.4);
-    transition: 0.3s;
-    z-index: 10;
-    position: relative;
-  }
-  .deposit-top:hover {
-    background: #e00909;
-    transform: translateY(-2px);
-  }
-
-  /* === Game Grid (Scrollable) === */
-  #games {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 25px;
-    max-width: 1200px;
-    margin: 0 auto 60px;
-    padding: 0 15px;
-    position: relative;
-    z-index: 10;
-  }
-
-  /* Responsive: 3 per row on tablet, 2 on small phone */
-  @media (max-width: 1024px) {
-    #games {
-      grid-template-columns: repeat(3, 1fr);
+    /* === Reset & Scroll Fix === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-  }
-  @media (max-width: 500px) {
-    #games {
-      grid-template-columns: repeat(2, 1fr);
+    body, html {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      font-family: Arial, sans-serif;
+      color: white;
+      position: relative;
     }
-  }
 
-  /* === Game Card (Round) === */
-  .game-card {
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-    transition: all 0.3s;
-  }
-  .game-card::before {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    background: linear-gradient(45deg, #fa0a0a, #ff8c00);
-    border-radius: 50%;
-    z-index: -1;
-  }
-  .game-card img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  .game-card:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px rgba(250, 10, 10, 0.6);
-  }
+    /* === Video Background === */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: -1;
+    }
 
-  /* === Modal === */
-  #depositModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.95);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-  }
-  .modal-content {
-    background: #111;
-    padding: 30px;
-    border-radius: 14px;
-    width: 90%;
-    max-width: 500px;
-    color: white;
-    border: 1px solid #fa0a0a;
-    box-shadow: 0 0 30px rgba(250, 10, 10, 0.3);
-  }
-  .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    color: #ccc;
-    cursor: pointer;
-  }
-  .close-btn:hover {
-    color: white;
-  }
-  h2 {
-    margin-bottom: 20px;
-    font-size: 22px;
-    color: #fa0a0a;
-    text-align: center;
-  }
-  label {
-    display: block;
-    text-align: left;
-    margin: 15px 0 5px;
-    font-weight: bold;
-    color: #ddd;
-  }
-  input, select {
-    width: 100%;
-    padding: 10px;
-    background: #222;
-    border: 1px solid #444;
-    color: white;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  button[type="submit"] {
-    margin-top: 20px;
-    padding: 14px;
-    background: #fa0a0a;
-    color: white;
-    border: none;
-    width: 100%;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  button[type="submit"]:hover {
-    background: #e00909;
-  }
-</style>
+    /* === Header & Logo === */
+    header {
+      margin-top: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+      z-index: 10;
+      position: relative;
+    }
+    header img {
+      width: 220px;
+      filter: drop-shadow(0 0 10px rgba(250, 10, 10, 0.6));
+    }
+
+    /* === Deposit Button === */
+    .deposit-top {
+      display: block;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto 40px auto;
+      padding: 16px;
+      background: #fa0a0a; /* Matches brand_color */
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(250, 10, 10, 0.4);
+      transition: 0.3s;
+      z-index: 10;
+      position: relative;
+    }
+    .deposit-top:hover {
+      background: #e00909;
+      transform: translateY(-2px);
+    }
+
+    /* === Game Grid === */
+    #games {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 0 15px;
+      position: relative;
+      z-index: 10;
+    }
+    @media (max-width: 1024px) {
+      #games {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 500px) {
+      #games {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* === Game Card (Round) === */
+    .game-card {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+      transition: all 0.3s;
+    }
+    .game-card::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      background: linear-gradient(45deg, #fa0a0a, #ff8c00);
+      border-radius: 50%;
+      z-index: -1;
+    }
+    .game-card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .game-card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(250, 10, 10, 0.6);
+    }
+
+    /* === Modal === */
+    #depositModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #111;
+      padding: 30px;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+      border: 1px solid #fa0a0a;
+      box-shadow: 0 0 30px rgba(250, 10, 10, 0.3);
+    }
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 24px;
+      color: #ccc;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      color: white;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #fa0a0a;
+      text-align: center;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin: 15px 0 5px;
+      font-weight: bold;
+      color: #ddd;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      background: #222;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button[type="submit"] {
+      margin-top: 20px;
+      padding: 14px;
+      background: #fa0a0a;
+      color: white;
+      border: none;
+      width: 100%;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button[type="submit"]:hover {
+      background: #e00909;
+    }
+  </style>
 </head>
 <body>
 
@@ -270,7 +267,7 @@
   </div>
 
   <script>
-    // === Your Games Data ===
+    // === Your Games Data (from your file) ===
     const games = [
       {
         id: "megaspinsweeps",
@@ -580,7 +577,7 @@
       }
     ];
 
-    // Render Games
+    // === Render Games ===
     const gamesContainer = document.getElementById('games');
     games.forEach(game => {
       const card = document.createElement('div');
@@ -589,7 +586,7 @@
       gamesContainer.appendChild(card);
     });
 
-    // Populate Game Dropdown
+    // === Populate Game Dropdown ===
     const gameSelect = document.querySelector('select[name="game"]');
     games.forEach(game => {
       const option = document.createElement('option');
@@ -597,13 +594,16 @@
       option.textContent = game.name;
       gameSelect.appendChild(option);
     });
-    gameSelect.value = games[0].name;
+    gameSelect.value = games[0].name; // Default to first game
 
-    // Handle Deposit Form
+    // === Handle Deposit Form ===
     document.getElementById('depositForm').onsubmit = function(e) {
       e.preventDefault();
       const formData = new FormData(this);
       const data = Object.fromEntries(formData);
+
+      // Save form data (optional)
+      sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
 
       // Build Wert.io Widget URL
       const wertUrl = new URL('https://sandbox.wert.io/widget');
@@ -614,17 +614,22 @@
       wertUrl.searchParams.append('amount', data.amount);
       wertUrl.searchParams.append('currency', 'USD');
       wertUrl.searchParams.append('commodity', 'USDC');
+      
+      // Use sepolia testnet (you can switch to amoy if needed)
       wertUrl.searchParams.append('network', 'ethereum_sepolia');
       wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
 
-      // Attach metadata (this stays in wert.io)
+      // Optional: Pass user & game data into metadata (visible in Wert.io dashboard)
+      wertUrl.searchParams.append('metadata[game]', data.game);
+      wertUrl.searchParams.append('metadata[username]', data.username);
       wertUrl.searchParams.append('metadata[name]', data.name);
       wertUrl.searchParams.append('metadata[email]', data.email);
       wertUrl.searchParams.append('metadata[phone]', data.phone);
-      wertUrl.searchParams.append('metadata[game]', data.game);
-      wertUrl.searchParams.append('metadata[username]', data.username);
 
-      // Open Wert.io
+      // Optional: Set brand color
+      wertUrl.searchParams.append('brand_color', '#fa0a0a');
+
+      // Open Wert.io in new tab
       window.open(wertUrl, '_blank');
 
       // Close modal
