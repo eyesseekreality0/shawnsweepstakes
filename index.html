@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -229,7 +229,7 @@
 
   <!-- Single Deposit Button -->
   <button class="deposit-top" id="buy-button">
-    💳 Buy Crypto & Deposit
+    Make a Deposit
   </button>
 
   <!-- Game Grid -->
@@ -292,7 +292,7 @@
   }
   </script>
 
-  <!-- Callback & Game Data -->
+  <!-- Game Data & Logic -->
   <script>
     // === Your Games Data ===
     const games = [
@@ -651,7 +651,6 @@
     function onWertCallback(event) {
       if (event.status === 'confirmed') {
         console.log('✅ Deposit Confirmed:', event);
-        // You can send event + metadata to a webhook here
       }
     }
   </script>
