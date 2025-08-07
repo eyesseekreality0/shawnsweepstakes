@@ -1,11 +1,11 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ShawnSweeps</title>
   <style>
-    /* === Reset & Scroll === */
+    /* === Reset & Scroll Fix === */
     * {
       margin: 0;
       padding: 0;
@@ -61,7 +61,7 @@
       max-width: 400px;
       margin: 0 auto 40px auto;
       padding: 16px;
-      background: #fa0a0a;
+      background: #fa0a0a; /* Matches brand_color */
       color: white;
       border: none;
       border-radius: 12px;
@@ -228,8 +228,8 @@
   </header>
 
   <!-- Single Deposit Button -->
-  <button class="deposit-top" id="buy-button">
-    Make a Deposit
+  <button class="deposit-top" onclick="document.getElementById('depositModal').style.display='flex';">
+    💳 Make a Deposit
   </button>
 
   <!-- Game Grid -->
@@ -266,37 +266,8 @@
     </div>
   </div>
 
-  <!-- Load Wert.io Widget Initializer -->
-  <script
-    type="text/javascript"
-    src="https://unpkg.com/@wert-io/widget-initializer@latest/dist/index.umd.js"
-    async
-    defer
-  ></script>
-
-  <!-- Wert.io Widget Configuration -->
- <script type="application/json" id="wert-widget">
-  {
-  "origin": "https://widget.wert.io",
-  "partner_id": "01K1T8VJJ8TY67M49FDXY865GF",
-  "container_id": "buy-button",
-  "currency": "USD",
-  "amount": 10,
-  "address": "0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d",
-  "network": "ethereum",
-  "commodity": "USDC",
-  "type": "buy",
-  "brand_color": "#fa0a0a",
-  "metadata": {
-    "integration": "shawnsweeps"
-  },
-  "callback": "onWertCallback"
- }
-</script>
-
-  <!-- Game Data & Logic -->
   <script>
-    // === Your Games Data ===
+    // === Your Games Data (from your file) ===
     const games = [
       {
         id: "megaspinsweeps",
@@ -623,38 +594,45 @@
       option.textContent = game.name;
       gameSelect.appendChild(option);
     });
-    gameSelect.value = games[0].name;
+    gameSelect.value = games[0].name; // Default to first game
 
-    // === Update Wert Widget with Form Data on Submit ===
+    // === Handle Deposit Form ===
     document.getElementById('depositForm').onsubmit = function(e) {
       e.preventDefault();
       const formData = new FormData(this);
       const data = Object.fromEntries(formData);
 
-      // Update Wert widget metadata
-      const wertConfig = document.getElementById('wert-widget');
-      const config = JSON.parse(wertConfig.innerHTML);
-      config.metadata.game = data.game;
-      config.metadata.username = data.username;
-      config.metadata.name = data.name;
-      config.metadata.email = data.email;
-      config.metadata.phone = data.phone;
-      config.amount = data.amount;
-      wertConfig.innerHTML = JSON.stringify(config);
+      // Save form data (optional)
+      sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
+
+      // Build Wert.io Widget URL (Fiat On-Ramp - No commodity/network needed)
+      const wertUrl = new URL('https://widget.wert.io');
+
+// Required Parameters
+wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF');
+wertUrl.searchParams.append('origin', window.location.origin);
+wertUrl.searchParams.append('amount', data.amount);
+wertUrl.searchParams.append('currency', 'USD');
+wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
+wertUrl.searchParams.append('brand_color', '#fa0a0a');
+
+// Optional: Pass your form data
+wertUrl.searchParams.append('metadata[game]', data.game);
+wertUrl.searchParams.append('metadata[username]', data.username);
+wertUrl.searchParams.append('metadata[name]', data.name);
+wertUrl.searchParams.append('metadata[email]', data.email);
+wertUrl.searchParams.append('metadata[phone]', data.phone);
+
+      
+      // Optional: Set brand color
+      wertUrl.searchParams.append('brand_color', '#fa0a0a');
+
+      // Open Wert.io in new tab
+      window.open(wertUrl, '_blank');
 
       // Close modal
       document.getElementById('depositModal').style.display = 'none';
-
-      // Trigger Wert widget
-      document.getElementById('buy-button').click();
     };
-
-    // === Wert Callback (Optional) ===
-    function onWertCallback(event) {
-      if (event.status === 'confirmed') {
-        console.log('✅ Deposit Confirmed:', event);
-      }
-    }
   </script>
 </body>
 </html>
