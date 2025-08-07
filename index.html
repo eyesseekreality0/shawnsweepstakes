@@ -606,15 +606,23 @@ document.getElementById('depositForm').onsubmit = function(e) {
   sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
 
   // Build WERT.IO PRODUCTION Widget URL
-  const wertUrl = new URL('https://wert.io/widget'); // ✅ Production URL
+  const wertUrl = new URL('https://widget.wert.io'); // ✅ Production URL
 
   // Required Parameters
-  wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF'); // ✅ Production Partner ID
-  wertUrl.searchParams.append('origin', window.location.origin);
-  wertUrl.searchParams.append('amount', data.amount);
-  wertUrl.searchParams.append('currency', 'USD');
-  wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
-  wertUrl.searchParams.append('brand_color', '#fa0a0a');
+ {
+  "partner_id": "01K1T8VJJ8TY67M49FDXY865GF",
+  "origin": "https://widget.wert.io",
+  "extra": {
+    "wallets": [
+      {
+        "name": "BTC",
+        "network": "Bitcoin",
+        "address": "396gWnU1XQyAaHAsKniQzLdMUNPSBY5BHY"
+      }
+    ]
+  },
+  "brand_color": "#fc0019"
+}
 
   // Optional: Pass metadata (shows in your dashboard)
   wertUrl.searchParams.append('metadata[game]', data.game);
