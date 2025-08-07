@@ -5,83 +5,208 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ShawnSweeps</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body, html {
-      width: 100%; height: 100%; overflow: hidden;
-      font-family: Arial, sans-serif; color: white; position: relative;
-    }
-    #bg-video {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      object-fit: cover; z-index: -2;
-    }
-    .video-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6); z-index: -1;
-    }
-    header {
-      margin-top: 30px; margin-bottom: 30px; text-align: center; z-index: 10; position: relative;
-    }
-    header img {
-      width: 220px; filter: drop-shadow(0 0 10px rgba(250, 10, 10, 0.6));
-    }
-    .deposit-top {
-      display: block; width: 90%; max-width: 400px; margin: 0 auto 40px auto;
-      padding: 16px; background: #fa0a0a; color: white; border: none;
-      border-radius: 12px; font-weight: bold; font-size: 17px; cursor: pointer;
-      box-shadow: 0 6px 15px rgba(250, 10, 10, 0.4); transition: 0.3s; z-index: 10; position: relative;
-    }
-    .deposit-top:hover { background: #e00909; transform: translateY(-2px); }
+  /* === Reset & Scroll Fix === */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body, html {
+    width: 100%;
+    min-height: 100vh; /* Not just 100% — allows scrolling */
+    overflow-x: hidden;
+    overflow-y: auto; /* Enable vertical scroll */
+    font-family: Arial, sans-serif;
+    color: white;
+    position: relative;
+  }
+
+  /* === Video Background (Fixed, Full Screen) === */
+  #bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    pointer-events: none;
+  }
+  .video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+  }
+
+  /* === Header & Logo === */
+  header {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+    z-index: 10;
+    position: relative;
+  }
+  header img {
+    width: 220px;
+    filter: drop-shadow(0 0 10px rgba(250, 10, 10, 0.6));
+  }
+
+  /* === Deposit Button === */
+  .deposit-top {
+    display: block;
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto 40px auto;
+    padding: 16px;
+    background: #fa0a0a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(250, 10, 10, 0.4);
+    transition: 0.3s;
+    z-index: 10;
+    position: relative;
+  }
+  .deposit-top:hover {
+    background: #e00909;
+    transform: translateY(-2px);
+  }
+
+  /* === Game Grid (Scrollable) === */
+  #games {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    padding: 0 15px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Responsive: 3 per row on tablet, 2 on small phone */
+  @media (max-width: 1024px) {
     #games {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px;
-      max-width: 1200px; margin: 0 auto 60px; padding: 0 15px; position: relative; z-index: 10;
+      grid-template-columns: repeat(3, 1fr);
     }
-    @media (max-width: 1024px) { #games { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 500px) { #games { grid-template-columns: repeat(2, 1fr); } }
-    .game-card {
-      position: relative; width: 100%; padding-bottom: 100%;
-      border-radius: 50%; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-      transition: all 0.3s;
+  }
+  @media (max-width: 500px) {
+    #games {
+      grid-template-columns: repeat(2, 1fr);
     }
-    .game-card::before {
-      content: ''; position: absolute; inset: -6px;
-      background: linear-gradient(45deg, #fa0a0a, #ff8c00); border-radius: 50%; z-index: -1;
-    }
-    .game-card img {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      object-fit: cover; border-radius: 50%;
-    }
-    .game-card:hover { transform: scale(1.1); box-shadow: 0 0 25px rgba(250, 10, 10, 0.6); }
-    #depositModal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center;
-    }
-    .modal-content {
-      background: #111; padding: 30px; border-radius: 14px; width: 90%; max-width: 500px;
-      color: white; border: 1px solid #fa0a0a; box-shadow: 0 0 30px rgba(250, 10, 10, 0.3);
-    }
-    .close-btn {
-      position: absolute; top: 15px; right: 20px;
-      font-size: 24px; color: #ccc; cursor: pointer;
-    }
-    .close-btn:hover { color: white; }
-    h2 {
-      margin-bottom: 20px; font-size: 22px; color: #fa0a0a; text-align: center;
-    }
-    label {
-      display: block; text-align: left; margin: 15px 0 5px;
-      font-weight: bold; color: #ddd;
-    }
-    input, select {
-      width: 100%; padding: 10px; background: #222; border: 1px solid #444;
-      color: white; border-radius: 6px; font-size: 14px;
-    }
-    button[type="submit"] {
-      margin-top: 20px; padding: 14px; background: #fa0a0a; color: white;
-      border: none; width: 100%; font-weight: bold; border-radius: 8px;
-      cursor: pointer; font-size: 16px;
-    }
-    button[type="submit"]:hover { background: #e00909; }
-  </style>
+  }
+
+  /* === Game Card (Round) === */
+  .game-card {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+    transition: all 0.3s;
+  }
+  .game-card::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    background: linear-gradient(45deg, #fa0a0a, #ff8c00);
+    border-radius: 50%;
+    z-index: -1;
+  }
+  .game-card img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .game-card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(250, 10, 10, 0.6);
+  }
+
+  /* === Modal === */
+  #depositModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background: #111;
+    padding: 30px;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 500px;
+    color: white;
+    border: 1px solid #fa0a0a;
+    box-shadow: 0 0 30px rgba(250, 10, 10, 0.3);
+  }
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+  }
+  .close-btn:hover {
+    color: white;
+  }
+  h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #fa0a0a;
+    text-align: center;
+  }
+  label {
+    display: block;
+    text-align: left;
+    margin: 15px 0 5px;
+    font-weight: bold;
+    color: #ddd;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px;
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  button[type="submit"] {
+    margin-top: 20px;
+    padding: 14px;
+    background: #fa0a0a;
+    color: white;
+    border: none;
+    width: 100%;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button[type="submit"]:hover {
+    background: #e00909;
+  }
+</style>
 </head>
 <body>
 
