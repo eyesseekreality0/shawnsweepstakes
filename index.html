@@ -606,10 +606,10 @@
       sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
 
       // Build Wert.io Widget URL (Fiat On-Ramp - No commodity/network needed)
-      const wertUrl = new URL('https://sandbox.wert.io/widget');
+      const wertUrl = new URL('https://wert.io/widget');
 
 // Required Parameters
-wertUrl.searchParams.append('partner_id', '01K0FHM9K6ATK1CYCHMV34Z0YG');
+wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF');
 wertUrl.searchParams.append('origin', window.location.origin);
 wertUrl.searchParams.append('amount', data.amount);
 wertUrl.searchParams.append('currency', 'USD');
