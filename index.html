@@ -231,7 +231,14 @@
   <button class="deposit-top" id="buy-button">
     Make a Deposit
   </button>
-
+  
+<script>
+  // Open the modal when "Make a Deposit" is clicked
+  document.getElementById('buy-button').onclick = function () {
+    document.getElementById('depositModal').style.display = 'flex';
+  };
+</script>
+  
   <!-- Game Grid -->
   <section id="games">
     <!-- Games will be injected here -->
