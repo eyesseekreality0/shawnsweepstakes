@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ShawnSweeps</title>
   <style>
-    /* === Reset & Scroll Fix === */
+    /* === Reset & Scroll === */
     * {
       margin: 0;
       padding: 0;
@@ -61,7 +61,7 @@
       max-width: 400px;
       margin: 0 auto 40px auto;
       padding: 16px;
-      background: #fa0a0a; /* Matches brand_color */
+      background: #fa0a0a;
       color: white;
       border: none;
       border-radius: 12px;
@@ -228,8 +228,8 @@
   </header>
 
   <!-- Single Deposit Button -->
-  <button class="deposit-top" onclick="document.getElementById('depositModal').style.display='flex';">
-    💳 Make a Deposit
+  <button class="deposit-top" id="buy-button">
+    Make a Deposit
   </button>
 
   <!-- Game Grid -->
@@ -266,8 +266,17 @@
     </div>
   </div>
 
+  <!-- Load Wert.io SDK -->
+  <script
+    type="text/javascript"
+    src="https://unpkg.com/@wert-io/widget-initializer@latest/dist/index.umd.js"
+    async
+    defer
+  ></script>
+
+  <!-- Game Data & Logic -->
   <script>
-    // === Your Games Data (from your file) ===
+    // === Your Games Data ===
     const games = [
       {
         id: "megaspinsweeps",
@@ -594,42 +603,64 @@
       option.textContent = game.name;
       gameSelect.appendChild(option);
     });
-    gameSelect.value = games[0].name; // Default to first game
+    gameSelect.value = games[0].name;
 
-    // === Handle Deposit Form ===
-    document.getElementById('depositForm').onsubmit = function(e) {
+    // === Handle Form Submit & Open Wert Widget ===
+    document.getElementById('depositForm').onsubmit = async function(e) {
       e.preventDefault();
       const formData = new FormData(this);
       const data = Object.fromEntries(formData);
 
-      // Save form data (optional)
-      sessionStorage.setItem('shawnsweeps_deposit', JSON.stringify(data));
+      try {
+        // Step 1: Create Session via Netlify Function
+        const sessionResponse = await fetch('/.netlify/functions/create-wert-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: data.amount,
+            email: data.email,
+            full_name: data.name,
+            phone: data.phone,
+            game: data.game,
+            username: data.username
+          })
+        });
 
-      // Build Wert.io Widget URL (Fiat On-Ramp - No commodity/network needed)
-      const wertUrl = new URL('https://widget.wert.io');
+        const { session_id } = await sessionResponse.json();
 
-// Required Parameters
-wertUrl.searchParams.append('partner_id', '01K1T8VJJ8TY67M49FDXY865GF');
-wertUrl.searchParams.append('origin', 'https://widget.wert.io');
-wertUrl.searchParams.append('amount', data.amount);
-wertUrl.searchParams.append('currency', 'USD');
-wertUrl.searchParams.append('address', '0x0118E8e2FCb391bCeb110F62b5B7B963477C1E0d');
-wertUrl.searchParams.append('brand_color', '#fa0a0a');
+        if (!session_id) throw new Error('No session ID returned');
 
-// Optional: Pass your form data
-wertUrl.searchParams.append('metadata[game]', data.game);
-wertUrl.searchParams.append('metadata[username]', data.username);
-wertUrl.searchParams.append('metadata[name]', data.name);
-wertUrl.searchParams.append('metadata[email]', data.email);
-wertUrl.searchParams.append('metadata[phone]', data.phone);
+        // Step 2: Initialize Wert Widget
+        const wertWidget = new WertWidget({
+          partner_id: '01K1T8VJJ8TY67M49FDXY865GF',
+          session_id: session_id,
+          origin: 'https://widget.wert.io',
+          click_id: `shawnsweeps_${Date.now()}`,
+          redirect_url: 'https://shawnsweepstakes.netlify.app/',
+          full_name: data.name,
+          email: data.email,
+          phone: data.phone,
+          country_of_residence: 'US',
+          state_of_residence: 'ID',
+          lang: 'en',
+          theme: 'dark',
+          brand_color: '#fa0a0a',
+          listeners: {
+            close: () => console.log('Widget closed'),
+            order_created: (event) => console.log('Order created:', event)
+          }
+        });
 
-      
+        // Open Widget
+        wertWidget.open();
 
-      // Open Wert.io in new tab
-      window.open(wertUrl, '_blank');
+        // Close modal
+        document.getElementById('depositModal').style.display = 'none';
 
-      // Close modal
-      document.getElementById('depositModal').style.display = 'none';
+      } catch (error) {
+        console.error('Wert Widget Error:', error);
+        alert('Failed to open deposit widget. Please try again.');
+      }
     };
   </script>
 </body>
