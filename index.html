@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShawnSweeps</title>
+  <style>
+    /* === Reset & Scroll === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      font-family: Arial, sans-serif;
+      color: white;
+      position: relative;
+    }
+
+    /* === Video Background === */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: -1;
+    }
+
+    /* === Header & Logo === */
+    header {
+      margin-top: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+      z-index: 10;
+      position: relative;
+    }
+
+    header img {
+      width: 220px;
+      filter: drop-shadow(0 0 10px rgba(250, 10, 10, 0.6));
+    }
+
+    /* === Deposit Button === */
+    .deposit-top {
+      display: block;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto 40px auto;
+      padding: 16px;
+      background: #fa0a0a;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(250, 10, 10, 0.4);
+      transition: 0.3s;
+      z-index: 10;
+      position: relative;
+    }
+
+    .deposit-top:hover {
+      background: #e00909;
+      transform: translateY(-2px);
+    }
+
+    /* === Game Grid === */
+    #games {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 0 15px;
+      position: relative;
+      z-index: 10;
+    }
+
+    @media (max-width: 1024px) {
+      #games {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      #games {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* === Game Card (Round) === */
+    .game-card {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      background: linear-gradient(45deg, #fa0a0a, #ff8c00);
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    .game-card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .game-card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(250, 10, 10, 0.6);
+    }
+
+    .game-card a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+    }
+
+    /* === Modal === */
+    #depositModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #111;
+      padding: 30px;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+      border: 1px solid #fa0a0a;
+      box-shadow: 0 0 30px rgba(250, 10, 10, 0.3);
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 24px;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: white;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #fa0a0a;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin: 15px 0 5px;
+      font-weight: bold;
+      color: #ddd;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      background: #222;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #fa0a0a;
+    }
+
+    button[type="submit"], #submitDeposit {
+      margin-top: 20px;
+      padding: 14px;
+      background: #fa0a0a;
+      color: white;
+      border: none;
+      width: 100%;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button[type="submit"]:hover, #submitDeposit:hover {
+      background: #e00909;
+    }
+
+    button[type="submit"]:disabled, #submitDeposit:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+
+    /* === Status Messages === */
+    .status-message {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      display: none;
+    }
+
+    .status-success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid #22c55e;
+    }
+
+    .status-error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+    }
+
+    .status-loading {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+      border: 1px solid #3b82f6;
+    }
+
+    /* === Loading Spinner === */
+    .loading-spinner {
+      border: 2px solid #333;
+      border-top: 2px solid #fa0a0a;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Video Background -->
+  <video id="bg-video"
+         src="https://shawn-sweepstakes.carrd.co/assets/videos/bg.mp4?v=0c91e9dc"
+         poster="https://shawn-sweepstakes.carrd.co/assets/videos/bg.mp4.jpg?v=0c91e9dc"
+         autoplay
+         preload="auto"
+         loop
+         playsinline
+         disablepictureinpicture
+         disableremoteplayback
+         webkit-playsinline
+         muted>
+  </video>
+  <div class="video-overlay"></div>
+
+  <!-- Header -->
+  <header>
+    <img src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" alt="ShawnSweeps Logo">
+  </header>
+
+  <!-- Deposit Button -->
+  <button class="deposit-top" id="buy-button">
+    Make a Deposit
+  </button>
+
+  <!-- Game Grid -->
+  <section id="games">
+    <!-- Games will be injected by JS -->
+  </section>
+
+  <!-- Deposit Modal -->
+  <div id="depositModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <h2>Deposit Funds</h2>
+      <div id="depositForm">
+        <label>Name *</label>
+        <input type="text" id="name" required placeholder="Enter your full name">
+        
+        <label>Email *</label>
+        <input type="email" id="email" required placeholder="Enter your email address">
+        
+        <label>Phone</label>
+        <input type="tel" id="phone" placeholder="Enter your phone number">
+        
+        <label>Game *</label>
+        <select id="game" required></select>
+        
+        <label>Username (In-Game) *</label>
+        <input type="text" id="username" required placeholder="Enter your game username">
+        
+        <label>Deposit Amount ($) *</label>
+        <input type="number" id="amount" value="10" min="5" max="10000" required placeholder="Minimum $5">
+        
+        <button type="button" id="submitDeposit">Make Deposit</button>
+        
+        <div id="statusMessage" class="status-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Wert.io SDK from official CDN -->
+  <script src="https://widget.wert.io/01DPBX8Z5F8X6XRP5TBRH4W6J6-widget.js" async defer></script>
+
+  <script>
+    // === Configuration ===
+    const CONFIG = {
+      WERT_CONFIG: {
+        partner_id: '01K1T8VJJ8TY67M49FDXY865GF',
+        origin: 'https://widget.wert.io',
+        theme: 'dark',
+        color_background: '#111111',
+        color_buttons: '#fa0a0a',
+        color_buttons_text: '#ffffff',
+        color_secondary_buttons: '#333333',
+        color_secondary_buttons_text: '#ffffff',
+        color_main_text: '#ffffff',
+        color_secondary_text: '#cccccc',
+        color_icons: '#fa0a0a',
+        color_links: '#fa0a0a',
+        color_success: '#22c55e',
+        color_warning: '#f59e0b',
+        color_error: '#ef4444'
+      }
+    };
+
+     // === Games Data ===
+    const games = [
+      { id: "megaspinsweeps", name: "Mega Spin Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://www.megaspinsweeps.com/index.html" },
+      { id: "vblink777", name: "VBLink777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/753a32c3.jpg?v=0c91e9dc", gameUrl: "https://www.vblink777.club/" },
+      { id: "goldentreasure", name: "Golden Treasure", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/7c9b03e5.jpg?v=0c91e9dc", gameUrl: "https://www.goldentreasure.mobi/" },
+      { id: "orionstars", name: "Orion Stars", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/417aedb1.png?v=0c91e9dc", gameUrl: "http://start.orionstars.vip:8580/index.html" },
+      { id: "firekirin", name: "Fire Kirin", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/189aadee.jpg?v=0c91e9dc", gameUrl: "http://start.firekirin.xyz:8580/index.html" },
+      { id: "rivermonster", name: "River Monster", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/253c9f08.jpg?v=0c91e9dc", gameUrl: "https://rm777.net/" },
+      { id: "riversweeps", name: "Riversweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/597c1510.jpg?v=0c91e9dc", gameUrl: "https://bet777.eu/" },
+      { id: "fortune2go", name: "Fortune 2 Go", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/d1498abc.jpg?v=0c91e9dc", gameUrl: "https://www.fortune2go20.com/mobile/Login/index.html" },
+      { id: "goldendragon", name: "Golden Dragon", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/de5f04bc.jpg?v=0c91e9dc", gameUrl: "https://playgd.mobi/SSLobby/3733.0/web-mobile/index.html" },
+      { id: "bludragon", name: "Blu Dragon", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/faeeb77b.png?v=0c91e9dc", gameUrl: "http://app.bluedragon777.com/" },
+      { id: "vegasx", name: "VEGAS X", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/1e472144.jpg?v=0c91e9dc", gameUrl: "https://vegas-x.org/" },
+      { id: "ultrapanda", name: "ULTRAPANDA", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/ad5dd9c6.jpg?v=0c91e9dc", gameUrl: "https://www.ultrapanda.mobi/" },
+      { id: "milkyways", name: "MILKY WAYS", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/2bc0a981.jpg?v=0c91e9dc", gameUrl: "https://milkywayapp.xyz/" },
+      { id: "luckypenny", name: "LUCKY PENNY", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/9b984f9c.jpg?v=0c91e9dc", gameUrl: "http://luckypenny.xyz:8580/index.html" },
+      { id: "gametime", name: "Gametime", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://game-time.vip:8580/index.html" },
+      { id: "goldstar", name: "Gold Star", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/74eb627d.jpg?v=0c91e9dc", gameUrl: "https://goldstar.games/" },
+      { id: "100plus", name: "100 Plus", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/e00a2881.jpg?v=0c91e9dc", gameUrl: "https://99.100plus.me/lobby/1684487595/index.html?agreement=1&/player/release/" },
+      { id: "gamevault", name: "Gamevault", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/050dac4a.jpg?v=0c91e9dc", gameUrl: "https://download.gamevault999.com/" },
+      { id: "galaxyworld", name: "Galaxy World", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/1f44c7e1.png?v=0c91e9dc", gameUrl: "https://m.galaxyworld999.com/" },
+      { id: "magiccity", name: "Magic City", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/71d5fc8f.jpg?v=0c91e9dc", gameUrl: "https://www.magiccity777.com/SSLobby/3657.0/web-mobile/index.html" },
+      { id: "highstake", name: "High Stake Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/e1d3a0f7.jpg?v=0c91e9dc", gameUrl: "https://dl.highstakesweeps.com/" },
+      { id: "sincity", name: "Sin City", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/98333b44.jpg?v=0c91e9dc", gameUrl: "https://sincitysweeps.net/" },
+      { id: "vegassweeps", name: "Vegas Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/bd38d36f.jpg?v=0c91e9dc", gameUrl: "https://m.lasvegassweeps.com/" },
+      { id: "ignite", name: "IGNITE", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/3603f518.png?v=0c91e9dc", gameUrl: "https://casinoignite.vip/" },
+      { id: "cashfrenzy", name: "Cashapp Frenzy", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a67374ce.jpg?v=0c91e9dc", gameUrl: "https://www.cashfrenzy777.com/" },
+      { id: "acebook", name: "ACEBOOK", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/09e14951.jpg?v=0c91e9dc", gameUrl: "https://www.playacebook.mobi/" },
+      { id: "bluedragon2", name: "Blue Dragon 2", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/637eb5ee.png?v=0c91e9dc", gameUrl: "http://app.getbluedragon.com/" },
+      { id: "juwa777", name: "Juwa777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/bebb5d9e.jpg?v=0c91e9dc", gameUrl: "https://dl.juwa777.com/" },
+      { id: "pandamaster", name: "Panda Master", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/0b6843e0.jpg?v=0c91e9dc", gameUrl: "https://pandamaster.vip:8888/index.html" },
+      { id: "fishglory", name: "Fish Glory", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/346fd5a6.jpg?v=0c91e9dc", gameUrl: "https://www.fishglory.games/" },
+      { id: "vegasroll", name: "Vegas Roll", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/7867671f.jpg?v=0c91e9dc", gameUrl: "http://www.vegas-roll.com/m" },
+      { id: "mrallinone", name: "Mr All In One", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/d6f9845f.jpg?v=0c91e9dc", gameUrl: "https://www.mrallinone777.com/m" },
+      { id: "orionpower", name: "ORION Power", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/6c415d9a.jpg?v=0c91e9dc", gameUrl: "http://product.orionpower.games/v1001/" },
+      { id: "quakegame", name: "Quake Game", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/0c63b506.jpg?v=0c91e9dc", gameUrl: "https://www.quakegame.net/" },
+      { id: "vegasluck777", name: "Vegas Luck 777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/961ffa7e.jpg?v=0c91e9dc", gameUrl: "https://start.vegasluck777.com/" },
+      { id: "noble777", name: "Noble 777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/21cf31e9.jpg?v=0c91e9dc", gameUrl: "https://www.noble777.com/m" },
+      { id: "cashmachine777", name: "Cash Machine 777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/d68e85e8.jpg?v=0c91e9dc", gameUrl: "https://www.cashmachine777.com/m" },
+      { id: "gameroom777", name: "Game Room 777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/92bca02e.jpg?v=0c91e9dc", gameUrl: "https://www.gameroom777.com/m" },
+      { id: "luckystars", name: "Lucky Stars", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/990e95bf.jpg?v=0c91e9dc", gameUrl: "http://www.luckystars.games/m" },
+      { id: "slots88888", name: "Slots 88888", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/035f8253.jpg?v=0c91e9dc", gameUrl: "https://www.slots88888.com/m" },
+      { id: "winstar99999", name: "Win Star 99999", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/b48ed188.jpg?v=0c91e9dc", gameUrl: "http://server.winstar99999.com:8009/m" },
+      { id: "mafia77777", name: "Mafia 77777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a3830c1f.jpg?v=0c91e9dc", gameUrl: "http://product.mafia77777.com/v1003/" },
+      { id: "yolo777", name: "YOLO 777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/e1b31467.jpg?v=0c91e9dc", gameUrl: "https://yolo777.game/" },
+      { id: "fpc", name: "FPC Mobile", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/2eb63b4e.png?v=0c91e9dc", gameUrl: "https://fpc-mob.com/AD/index.html" },
+      { id: "winnersclub777", name: "Winners Club 777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a9e0fca0.jpg?v=0c91e9dc", gameUrl: "https://www.winnersclub777.com/" },
+      { id: "legendfire", name: "Legend Fire", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/8b67f370.jpg?v=0c91e9dc", gameUrl: "https://www.legendfire.xyz/" },
+      { id: "firelinkplus", name: "Fire Link Plus", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f592d30c.jpg?v=0c91e9dc", gameUrl: "https://firelinkplus.com/" },
+      { id: "blackmamba", name: "Black Mamba", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/b99b4435.jpg?v=0c91e9dc", gameUrl: "https://blackmamba.mobi/" },
+      { id: "playorca", name: "Play Orca", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a281d47e.jpg?v=0c91e9dc", gameUrl: "https://playorca.mobi/" },
+      { id: "playbdd", name: "Play BDD", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/fcf9c9dd.jpg?v=0c91e9dc", gameUrl: "https://www.playbdd.com/" },
+      { id: "kraken", name: "The Kraken", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f6ee4ae8.jpg?v=0c91e9dc", gameUrl: "https://getthekraken.com/" }
+    ];
+
+    // === Utility Functions ===
+    function generateClickId() {
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substr(2, 9);
+      return `shawnsweeps_${timestamp}_${random}`;
+    }
+
+    function showStatus(message, type = 'loading') {
+      const statusDiv = document.getElementById('statusMessage');
+      statusDiv.className = `status-message status-${type}`;
+      
+      if (type === 'loading') {
+        statusDiv.innerHTML = `<span class="loading-spinner"></span>${message}`;
+      } else {
+        statusDiv.textContent = message;
+      }
+      
+      statusDiv.style.display = 'block';
+      
+      // Log to console for debugging
+      console.log(`Status [${type}]: ${message}`);
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          statusDiv.style.display = 'none';
+        }, 5000);
+      } else if (type === 'error') {
+        setTimeout(() => {
+          statusDiv.style.display = 'none';
+        }, 8000);
+      }
+    }
+
+    function validateForm() {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+
+      if (!name) {
+        showStatus('Please enter your full name', 'error');
+        return false;
+      }
+      if (!email || !email.includes('@')) {
+        showStatus('Please enter a valid email address', 'error');
+        return false;
+      }
+      if (!username) {
+        showStatus('Please enter your game username', 'error');
+        return false;
+      }
+      if (!amount || amount < 5) {
+        showStatus('Minimum deposit amount is $5', 'error');
+        return false;
+      }
+      if (amount > 10000) {
+        showStatus('Maximum deposit amount is $10,000', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    function closeModal() {
+      document.getElementById('depositModal').style.display = 'none';
+      document.getElementById('statusMessage').style.display = 'none';
+      // Re-enable submit button
+      document.getElementById('submitDeposit').disabled = false;
+    }
+
+    // === Handle Deposit ===
+    async function handleDeposit() {
+      if (!validateForm()) return;
+
+      // Get form data
+      const formData = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        game: document.getElementById('game').value,
+        username: document.getElementById('username').value.trim(),
+        amount: parseFloat(document.getElementById('amount').value)
+      };
+      
+      const clickId = generateClickId();
+      
+      // Log transaction details
+      console.log('Starting transaction:', {
+        clickId,
+        formData,
+        timestamp: new Date().toISOString()
+      });
+      
+      showStatus('Initializing secure payment...', 'loading');
+      
+      // Disable submit button
+      const submitButton = document.getElementById('submitDeposit');
+      submitButton.disabled = true;
+      
+      try {
+        // Wait for Wert SDK to be available
+        await waitForWertSDK();
+        
+        // Create comprehensive user metadata for dashboard logging
+        const userMetadata = {
+          user_id: clickId,
+          user_name: formData.name,
+          user_email: formData.email,
+          user_phone: formData.phone || '',
+          game_selected: formData.game,
+          game_username: formData.username,
+          purchase_amount: formData.amount,
+          purchase_currency: 'USD',
+          item_name: `${formData.game} - Gaming Credits`,
+          item_category: 'gaming',
+          merchant_name: 'ShawnSweeps',
+          timestamp: new Date().toISOString()
+        };
+        
+        // Create Wert widget options with proper configuration for dashboard logging
+        const wertOptions = {
+          partner_id: CONFIG.WERT_CONFIG.partner_id,
+          origin: CONFIG.WERT_CONFIG.origin,
+          
+          // Transaction details
+          click_id: clickId,
+          commodity: 'USD',
+          commodity_amount: formData.amount,
+          
+          // Smart contract details (optional for dashboard logging)
+          sc_address: '0x56283fef6678c663C2fFf1c806c377bA038E10Aa',
+          sc_input_data: clickId, // Simple identifier for tracking
+          
+          // User information for dashboard
+          user_email: formData.email,
+          user_name: formData.name,
+          user_phone: formData.phone || '',
+          
+          // Product information
+          extra: {
+            item_info: {
+              name: userMetadata.item_name,
+              category: userMetadata.item_category,
+              author: 'ShawnSweeps',
+              seller: 'ShawnSweeps',
+              image_url: 'https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc'
+            },
+            // Custom metadata that will appear in Wert dashboard
+            custom_params: {
+              game_selected: formData.game,
+              game_username: formData.username,
+              user_id: clickId,
+              source: 'shawnsweeps_website'
+            }
+          },
+          
+          // Styling
+          theme: CONFIG.WERT_CONFIG.theme,
+          color_background: CONFIG.WERT_CONFIG.color_background,
+          color_buttons: CONFIG.WERT_CONFIG.color_buttons,
+          color_buttons_text: CONFIG.WERT_CONFIG.color_buttons_text,
+          color_secondary_buttons: CONFIG.WERT_CONFIG.color_secondary_buttons,
+          color_secondary_buttons_text: CONFIG.WERT_CONFIG.color_secondary_buttons_text,
+          color_main_text: CONFIG.WERT_CONFIG.color_main_text,
+          color_secondary_text: CONFIG.WERT_CONFIG.color_secondary_text,
+          color_icons: CONFIG.WERT_CONFIG.color_icons,
+          color_links: CONFIG.WERT_CONFIG.color_links,
+          color_success: CONFIG.WERT_CONFIG.color_success,
+          color_warning: CONFIG.WERT_CONFIG.color_warning,
+          color_error: CONFIG.WERT_CONFIG.color_error,
+          
+          // Event listeners for dashboard logging and user feedback
+          listeners: {
+            loaded: () => {
+              console.log('Wert widget loaded successfully for transaction:', clickId);
+              showStatus('Payment widget loaded successfully', 'success');
+              
+              // Log widget load event
+              logEvent('widget_loaded', {
+                click_id: clickId,
+                user_email: formData.email,
+                amount: formData.amount,
+                game: formData.game
+              });
+            },
+            
+            open: () => {
+              console.log('Wert widget opened for transaction:', clickId);
+              showStatus('Opening secure payment window...', 'loading');
+              
+              // Log widget open event
+              logEvent('widget_opened', {
+                click_id: clickId,
+                user_email: formData.email,
+                timestamp: new Date().toISOString()
+              });
+            },
+            
+            close: (closeEvent) => {
+              console.log('Wert widget closed:', closeEvent, 'for transaction:', clickId);
+              closeModal();
+              
+              // Log widget close event
+              logEvent('widget_closed', {
+                click_id: clickId,
+                close_reason: closeEvent?.reason || 'user_action',
+                timestamp: new Date().toISOString()
+              });
+            },
+            
+            error: (error) => {
+              console.error('Wert widget error:', error, 'for transaction:', clickId);
+              showStatus(`Payment error: ${error.message || 'Unknown error occurred'}`, 'error');
+              
+              // Log error event
+              logEvent('widget_error', {
+                click_id: clickId,
+                error_message: error.message || 'Unknown error',
+                error_code: error.code || 'UNKNOWN',
+                timestamp: new Date().toISOString()
+              });
+            },
+            
+            payment_status: (paymentData) => {
+              console.log('Payment status update:', paymentData, 'for transaction:', clickId);
+              
+              // Log all payment status changes
+              logEvent('payment_status_change', {
+                click_id: clickId,
+                status: paymentData.status,
+                transaction_id: paymentData.tx_id || paymentData.payment_id,
+                amount: formData.amount,
+                currency: 'USD',
+                user_email: formData.email,
+                game: formData.game,
+                timestamp: new Date().toISOString(),
+                raw_data: paymentData
+              });
+              
+              switch (paymentData.status) {
+                case 'pending':
+                  showStatus('Payment is being processed...', 'loading');
+                  break;
+                  
+                case 'success':
+                  showStatus('Payment completed successfully!', 'success');
+                  handlePaymentSuccess(paymentData, formData, clickId);
+                  break;
+                  
+                case 'failed':
+                  showStatus('Payment failed. Please try again.', 'error');
+                  logEvent('payment_failed', {
+                    click_id: clickId,
+                    reason: paymentData.failure_reason || 'Unknown',
+                    timestamp: new Date().toISOString()
+                  });
+                  break;
+                  
+                case 'cancelled':
+                  showStatus('Payment was cancelled.', 'error');
+                  logEvent('payment_cancelled', {
+                    click_id: clickId,
+                    timestamp: new Date().toISOString()
+                  });
+                  break;
+                  
+                default:
+                  console.log('Unknown payment status:', paymentData.status);
+                  logEvent('payment_status_unknown', {
+                    click_id: clickId,
+                    status: paymentData.status,
+                    data: paymentData,
+                    timestamp: new Date().toISOString()
+                  });
+              }
+            }
+          }
+        };
+        
+        // Log transaction initiation
+        logEvent('transaction_initiated', userMetadata);
+        
+        // Initialize Wert widget
+        console.log('Initializing Wert widget with options:', wertOptions);
+        
+        if (typeof WertWidget !== 'undefined') {
+          const wertWidget = new WertWidget(wertOptions);
+          wertWidget.open();
+        } else if (window.WertWidget) {
+          const wertWidget = new window.WertWidget(wertOptions);
+          wertWidget.open();
+        } else {
+          throw new Error('Wert SDK not available');
+        }
+        
+        console.log('Wert widget initialized successfully with click ID:', clickId);
+        
+      } catch (error) {
+        console.error('Error initializing Wert widget:', error);
+        showStatus(`Failed to initialize payment: ${error.message}`, 'error');
+        
+        // Log initialization error
+        logEvent('widget_init_error', {
+          click_id: clickId,
+          error_message: error.message,
+          timestamp: new Date().toISOString()
+        });
+        
+        submitButton.disabled = false;
+      }
+    }
+
+    // === Handle Payment Success ===
+    function handlePaymentSuccess(paymentData, formData, clickId) {
+      console.log('Payment successful:', paymentData);
+      
+      const transactionId = paymentData.tx_id || paymentData.payment_id || clickId;
+      
+      // Log successful payment with all details
+      logEvent('payment_completed', {
+        click_id: clickId,
+        transaction_id: transactionId,
+        amount: formData.amount,
+        currency: 'USD',
+        user_name: formData.name,
+        user_email: formData.email,
+        game: formData.game,
+        game_username: formData.username,
+        timestamp: new Date().toISOString(),
+        payment_data: paymentData
+      });
+      
+      // Show success message with transaction details
+      showStatus(`Payment successful! Transaction ID: ${transactionId}`, 'success');
+      
+      // Auto-close modal and offer to open game
+      setTimeout(() => {
+        closeModal();
+        
+        if (confirm(`Payment successful! Would you like to open ${formData.game} now?`)) {
+          const selectedGame = games.find(g => g.name === formData.game);
+          if (selectedGame) {
+            // Log game redirect
+            logEvent('game_redirect', {
+              click_id: clickId,
+              game: formData.game,
+              game_url: selectedGame.gameUrl,
+              timestamp: new Date().toISOString()
+            });
+            
+            window.open(selectedGame.gameUrl, '_blank');
+          }
+        }
+      }, 3000);
+    }
+
+    // === Event Logging Function ===
+    function logEvent(eventType, eventData) {
+      const logEntry = {
+        event_type: eventType,
+        timestamp: new Date().toISOString(),
+        data: eventData
+      };
+      
+      // Console logging for development
+      console.log(`[${eventType.toUpperCase()}]`, eventData);
+      
+      // Store in browser for debugging (optional)
+      if (!window.shawnSweepsLogs) {
+        window.shawnSweepsLogs = [];
+      }
+      window.shawnSweepsLogs.push(logEntry);
+      
+      // All events are automatically logged to Wert dashboard through the widget
+      // No additional API calls needed for dashboard logging
+    }
+
+    // === Wait for Wert SDK ===
+    function waitForWertSDK(maxAttempts = 50) {
+      return new Promise((resolve, reject) => {
+        let attempts = 0;
+        
+        const checkSDK = () => {
+          attempts++;
+          
+          if (typeof WertWidget !== 'undefined' || window.WertWidget) {
+            console.log('Wert SDK loaded successfully');
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            console.error('Wert SDK failed to load after', maxAttempts, 'attempts');
+            reject(new Error('Wert SDK failed to load. Please refresh the page and try again.'));
+          } else {
+            setTimeout(checkSDK, 200);
+          }
+        };
+        
+        checkSDK();
+      });
+    }
+
+    // === Initialize Page ===
+    function initializePage() {
+      console.log('Initializing ShawnSweeps page...');
+      
+      // Render Games
+      const gamesContainer = document.getElementById('games');
+      games.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.innerHTML = `
+          <a href="${game.gameUrl}" target="_blank">
+            <img src="${game.imageUrl}" alt="${game.name}" onerror="this.style.display='none'">
+          </a>
+        `;
+        gamesContainer.appendChild(card);
+      });
+
+      // Populate Game Dropdown
+      const gameSelect = document.getElementById('game');
+      games.forEach(game => {
+        const option = document.createElement('option');
+        option.value = game.name;
+        option.textContent = game.name;
+        gameSelect.appendChild(option);
+      });
+      
+      // Set default game
+      if (games.length > 0) {
+        gameSelect.value = games[0].name;
+      }
+
+      // Event Listeners
+      document.getElementById('buy-button').addEventListener('click', function() {
+        document.getElementById('depositModal').style.display = 'flex';
+        
+        // Log modal open event
+        logEvent('deposit_modal_opened', {
+          timestamp: new Date().toISOString()
+        });
+      });
+
+      document.getElementById('submitDeposit').addEventListener('click', handleDeposit);
+
+      // Close modal when clicking outside
+      document.getElementById('depositModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeModal();
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('depositModal').style.display === 'flex') {
+          closeModal();
+        }
+      });
+
+      // Log page initialization
+      logEvent('page_initialized', {
+        games_count: games.length,
+        timestamp: new Date().toISOString()
+      });
+
+      console.log('ShawnSweeps initialized successfully with', games.length, 'games');
+    }
+
+    // === Initialize Page on Load ===
+    function ready(fn) {
+      if (document.readyState !== 'loading') {
+        fn();
+      } else {
+        document.addEventListener('DOMContentLoaded', fn);
+      }
+    }
+
+    // Global close modal function for HTML onclick
+    window.closeModal = closeModal;
+
+    // Initialize when ready
+    ready(initializePage);
+
+    // === Global Error Handler ===
+    window.addEventListener('error', (event) => {
+      console.error('Global JavaScript error:', event.error);
+      
+      logEvent('javascript_error', {
+        message: event.error?.message || 'Unknown error',
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // === Debug Functions ===
+    window.shawnSweepsDebug = {
+      getLogs: () => window.shawnSweepsLogs || [],
+      clearLogs: () => { window.shawnSweepsLogs = []; },
+      testDeposit: handleDeposit,
+      getConfig: () => CONFIG,
+      games: games,
+      generateTestClickId: generateClickId
+    };
+
+    console.log('ShawnSweeps debug tools available at window.shawnSweepsDebug');
+  </script>
+</body>
+</html>
