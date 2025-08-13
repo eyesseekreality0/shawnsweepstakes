@@ -1,0 +1,472 @@
+import React, { useState, useEffect } from 'react';
+
+const ShawnSweeps = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWertLoaded, setIsWertLoaded] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    game: '',
+    username: '',
+    amount: 10
+  });
+  const [status, setStatus] = useState({ message: '', type: '' });
+
+  const games = [
+    { id: "megaspinsweeps", name: "Mega Spin Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://www.megaspinsweeps.com/index.html" },
+    { id: "vblink777", name: "VBLink777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/753a32c3.jpg?v=0c91e9dc", gameUrl: "https://www.vblink777.club/" },
+    { id: "goldentreasure", name: "Golden Treasure", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/7c9b03e5.jpg?v=0c91e9dc", gameUrl: "https://www.goldentreasure.mobi/" },
+    { id: "orionstars", name: "Orion Stars", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/417aedb1.png?v=0c91e9dc", gameUrl: "http://start.orionstars.vip:8580/index.html" },
+    { id: "firekirin", name: "Fire Kirin", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/189aadee.jpg?v=0c91e9dc", gameUrl: "http://start.firekirin.xyz:8580/index.html" },
+    { id: "rivermonster", name: "River Monster", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/253c9f08.jpg?v=0c91e9dc", gameUrl: "https://rm777.net/" },
+    { id: "riversweeps", name: "Riversweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/597c1510.jpg?v=0c91e9dc", gameUrl: "https://bet777.eu/" },
+    { id: "fortune2go", name: "Fortune 2 Go", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/d1498abc.jpg?v=0c91e9dc", gameUrl: "https://www.fortune2go20.com/mobile/Login/index.html" },
+    { id: "goldendragon", name: "Golden Dragon", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/de5f04bc.jpg?v=0c91e9dc", gameUrl: "https://playgd.mobi/SSLobby/3733.0/web-mobile/index.html" },
+    { id: "bludragon", name: "Blu Dragon", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/faeeb77b.png?v=0c91e9dc", gameUrl: "http://app.bluedragon777.com/" },
+    { id: "vegasx", name: "VEGAS X", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/1e472144.jpg?v=0c91e9dc", gameUrl: "https://vegas-x.org/" },
+    { id: "ultrapanda", name: "ULTRAPANDA", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/ad5dd9c6.jpg?v=0c91e9dc", gameUrl: "https://www.ultrapanda.mobi/" },
+    { id: "milkyways", name: "MILKY WAYS", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/2bc0a981.jpg?v=0c91e9dc", gameUrl: "https://milkywayapp.xyz/" },
+    { id: "luckypenny", name: "LUCKY PENNY", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/9b984f9c.jpg?v=0c91e9dc", gameUrl: "http://luckypenny.xyz:8580/index.html" },
+    { id: "gametime", name: "Gametime", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://game-time.vip:8580/index.html" },
+    { id: "goldstar", name: "Gold Star", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/74eb627d.jpg?v=0c91e9dc", gameUrl: "https://goldstar.games/" }
+  ];
+
+  // Load Wert SDK
+  useEffect(() => {
+    const loadWertSDK = () => {
+      if (window.WertWidget) {
+        setIsWertLoaded(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://widget.wert.io/01DPBX8Z5F8X6XRP5TBRH4W6J6-widget.js';
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        setIsWertLoaded(true);
+        console.log('Wert SDK loaded successfully');
+      };
+      
+      script.onerror = () => {
+        console.error('Failed to load Wert SDK');
+        showStatus('Failed to load payment system', 'error');
+      };
+
+      document.head.appendChild(script);
+
+      return () => {
+        document.head.removeChild(script);
+      };
+    };
+
+    loadWertSDK();
+    
+    // Set default game
+    if (games.length > 0 && !formData.game) {
+      setFormData(prev => ({ ...prev, game: games[0].name }));
+    }
+  }, []);
+
+  const generateClickId = () => {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 9);
+    return `shawnsweeps_${timestamp}_${random}`;
+  };
+
+  const showStatus = (message, type = 'loading') => {
+    setStatus({ message, type });
+    if (type === 'success') {
+      setTimeout(() => setStatus({ message: '', type: '' }), 5000);
+    } else if (type === 'error') {
+      setTimeout(() => setStatus({ message: '', type: '' }), 8000);
+    }
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      showStatus('Please enter your full name', 'error');
+      return false;
+    }
+    if (!formData.email.trim() || !formData.email.includes('@')) {
+      showStatus('Please enter a valid email address', 'error');
+      return false;
+    }
+    if (!formData.username.trim()) {
+      showStatus('Please enter your game username', 'error');
+      return false;
+    }
+    if (!formData.amount || formData.amount < 5) {
+      showStatus('Minimum deposit amount is $5', 'error');
+      return false;
+    }
+    if (formData.amount > 10000) {
+      showStatus('Maximum deposit amount is $10,000', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDeposit = () => {
+    if (!validateForm()) return;
+    
+    if (!isWertLoaded) {
+      showStatus('Payment system is loading, please wait...', 'loading');
+      return;
+    }
+
+    if (!window.WertWidget) {
+      showStatus('Payment system not available, please refresh the page', 'error');
+      return;
+    }
+    
+    const clickId = generateClickId();
+    showStatus('Initializing secure payment...', 'loading');
+    
+    // Wert widget configuration
+    const wertOptions = {
+      partner_id: '01K1T8VJJ8TY67M49FDXY865GF',
+      click_id: clickId,
+      origin: 'https://widget.wert.io',
+      theme: 'dark',
+      commodity: 'USD',
+      commodity_amount: formData.amount,
+      currency: 'USD',
+      currency_amount: formData.amount,
+      
+      // User information
+      user_email: formData.email,
+      user_name: formData.name,
+      user_phone: formData.phone || '',
+      
+      // Custom styling to match your brand
+      color_background: '#111111',
+      color_buttons: '#fa0a0a',
+      color_buttons_text: '#ffffff',
+      color_secondary_buttons: '#333333',
+      color_secondary_buttons_text: '#ffffff',
+      color_main_text: '#ffffff',
+      color_secondary_text: '#cccccc',
+      color_icons: '#fa0a0a',
+      color_links: '#fa0a0a',
+      color_success: '#22c55e',
+      color_warning: '#f59e0b',
+      color_error: '#ef4444',
+      
+      // Metadata for tracking
+      extra: {
+        item_info: {
+          name: `${formData.game} - Gaming Credits`,
+          category: 'gaming',
+          author: 'ShawnSweeps',
+          seller: 'ShawnSweeps',
+          image_url: 'https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc'
+        },
+        custom_params: {
+          game_selected: formData.game,
+          game_username: formData.username,
+          user_id: clickId,
+          source: 'shawnsweeps_website'
+        }
+      },
+      
+      // Event listeners
+      listeners: {
+        loaded: () => {
+          console.log('Wert widget loaded for transaction:', clickId);
+          showStatus('Payment widget loaded successfully', 'success');
+        },
+        
+        open: () => {
+          console.log('Wert widget opened for transaction:', clickId);
+          showStatus('Opening secure payment window...', 'loading');
+        },
+        
+        close: (closeEvent) => {
+          console.log('Wert widget closed:', closeEvent);
+          showStatus('Payment window closed', 'error');
+        },
+        
+        error: (error) => {
+          console.error('Wert widget error:', error);
+          showStatus(`Payment error: ${error.message || 'Unknown error occurred'}`, 'error');
+        },
+        
+        payment_status: (paymentData) => {
+          console.log('Payment status update:', paymentData);
+          
+          switch (paymentData.status) {
+            case 'pending':
+              showStatus('Payment is being processed...', 'loading');
+              break;
+              
+            case 'success':
+              showStatus('Payment completed successfully!', 'success');
+              handlePaymentSuccess(paymentData, formData, clickId);
+              break;
+              
+            case 'failed':
+              showStatus('Payment failed. Please try again.', 'error');
+              break;
+              
+            case 'cancelled':
+              showStatus('Payment was cancelled.', 'error');
+              break;
+              
+            default:
+              console.log('Unknown payment status:', paymentData.status);
+          }
+        }
+      }
+    };
+    
+    try {
+      console.log('Initializing Wert widget with options:', wertOptions);
+      const wertWidget = new window.WertWidget(wertOptions);
+      wertWidget.open();
+      console.log('Wert widget initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Wert widget:', error);
+      showStatus(`Failed to initialize payment: ${error.message}`, 'error');
+    }
+  };
+
+  const handlePaymentSuccess = (paymentData, formData, clickId) => {
+    console.log('Payment successful:', paymentData);
+    
+    const transactionId = paymentData.tx_id || paymentData.payment_id || clickId;
+    
+    // Show success message
+    showStatus(`Payment successful! Transaction ID: ${transactionId}`, 'success');
+    
+    // Auto-close modal and offer to open game
+    setTimeout(() => {
+      setIsModalOpen(false);
+      
+      if (window.confirm(`Payment successful! Would you like to open ${formData.game} now?`)) {
+        const selectedGame = games.find(g => g.name === formData.game);
+        if (selectedGame) {
+          window.open(selectedGame.gameUrl, '_blank');
+        }
+      }
+    }, 3000);
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+      {/* Video Background */}
+      <video
+        className="fixed top-0 left-0 w-full h-full object-cover -z-20"
+        src="https://shawn-sweepstakes.carrd.co/assets/videos/bg.mp4?v=0c91e9dc"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+      <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 -z-10" />
+
+      {/* Header */}
+      <header className="mt-8 mb-8 text-center relative z-10">
+        <img
+          src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc"
+          alt="ShawnSweeps Logo"
+          className="w-56 mx-auto filter drop-shadow-lg"
+          style={{ filter: 'drop-shadow(0 0 10px rgba(250, 10, 10, 0.6))' }}
+        />
+      </header>
+
+      {/* Deposit Button */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="block w-full max-w-md mx-auto mb-10 px-6 py-4 bg-red-600 hover:bg-red-700 text-white font-bold text-lg rounded-xl shadow-lg transition-all duration-300 hover:transform hover:-translate-y-1"
+        style={{ boxShadow: '0 6px 15px rgba(250, 10, 10, 0.4)' }}
+      >
+        Make a Deposit
+      </button>
+
+      {/* Games Grid */}
+      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16 px-4 relative z-10">
+        {games.map((game) => (
+          <div key={game.id} className="relative group">
+            <div
+              className="relative w-full pb-[100%] rounded-full overflow-hidden shadow-lg transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-red-500/40"
+              style={{ boxShadow: '0 6px 15px rgba(0,0,0,0.5)' }}
+            >
+              <div className="absolute inset-[-6px] rounded-full bg-gradient-to-r from-red-600 to-orange-500 -z-10" />
+              <a
+                href={game.gameUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute inset-0 block"
+              >
+                <img
+                  src={game.imageUrl}
+                  alt={game.name}
+                  className="absolute inset-0 w-full h-full object-cover rounded-full"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </a>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* Deposit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 p-8 rounded-2xl w-full max-w-lg border border-red-600 shadow-xl relative">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-red-600">Deposit Funds</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-2xl text-gray-400 hover:text-white transition-colors"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter your full name"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email address"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="Enter your phone number (optional)"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Game *
+                </label>
+                <select
+                  name="game"
+                  value={formData.game}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-600 transition-colors"
+                  required
+                >
+                  {games.map((game) => (
+                    <option key={game.id} value={game.name}>
+                      {game.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Username (In-Game) *
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  placeholder="Enter your game username"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Deposit Amount ($) *
+                </label>
+                <input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleInputChange}
+                  min="5"
+                  max="10000"
+                  placeholder="Minimum $5"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 transition-colors"
+                  required
+                />
+              </div>
+
+              <button
+                onClick={handleDeposit}
+                disabled={!isWertLoaded}
+                className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                {!isWertLoaded ? 'Loading Payment System...' : 'Make Deposit'}
+              </button>
+
+              {/* SDK Loading Indicator */}
+              {!isWertLoaded && (
+                <div className="text-center text-sm text-gray-400">
+                  <div className="inline-block w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin mr-2" />
+                  Loading secure payment system...
+                </div>
+              )}
+
+              {/* Status Message */}
+              {status.message && (
+                <div
+                  className={`mt-4 p-3 rounded-lg text-center font-medium transition-all duration-300 ${
+                    status.type === 'success'
+                      ? 'bg-green-900 bg-opacity-20 text-green-400 border border-green-400'
+                      : status.type === 'error'
+                      ? 'bg-red-900 bg-opacity-20 text-red-400 border border-red-400'
+                      : 'bg-blue-900 bg-opacity-20 text-blue-400 border border-blue-400'
+                  }`}
+                >
+                  {status.type === 'loading' && (
+                    <div className="inline-block w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mr-2" />
+                  )}
+                  {status.message}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ShawnSweeps;
