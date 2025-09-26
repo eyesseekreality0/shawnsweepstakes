@@ -14,12 +14,15 @@ body, html { width: 100%; min-height: 100vh; overflow-x: hidden; font-family: Ar
 .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; }
 
 /* Header */
-header { text-align: center; margin: 30px 0; position: relative; z-index: 10; }
+header { text-align: center; margin: 30px 0 20px; position: relative; z-index: 10; }
 header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
 
-/* Deposit Button */
-.deposit-top { display: block; width: 90%; max-width: 400px; margin: 0 auto 40px; padding: 16px; background: #fa0a0a; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 17px; cursor: pointer; box-shadow: 0 6px 15px rgba(250,10,10,0.4); transition: 0.3s; }
-.deposit-top:hover { background: #e00909; transform: translateY(-2px); }
+/* Social Media Buttons */
+.social-buttons { display: flex; justify-content: center; gap: 15px; margin: 20px 0 40px; flex-wrap: wrap; position: relative; z-index: 10; }
+.social-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(250, 10, 10, 0.9); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(250, 10, 10, 0.3); }
+.social-btn:hover { background: rgba(224, 9, 9, 0.9); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(250, 10, 10, 0.4); }
+.social-btn i { font-size: 18px; }
+@media (max-width: 500px) { .social-buttons { gap: 10px; } .social-btn { padding: 10px 16px; font-size: 13px; } }
 
 /* Game Grid */
 #games { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto 60px; padding: 0 15px; position: relative; z-index: 10; }
@@ -28,30 +31,8 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
 .game-card { position: relative; width: 100%; padding-bottom: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.5); transition: all 0.3s; }
 .game-card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .game-card:hover { transform: scale(1.1); box-shadow: 0 0 25px rgba(250,10,10,0.6); }
-
-/* Modal */
-#depositModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
-.modal-content { background: #111; padding: 30px; border-radius: 14px; width: 90%; max-width: 500px; border: 1px solid #fa0a0a; position: relative; }
-.close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #ccc; cursor: pointer; }
-.close-btn:hover { color: white; }
-h2 { margin-bottom: 20px; font-size: 22px; color: #fa0a0a; text-align: center; }
-label { display: block; margin: 15px 0 5px; font-weight: bold; color: #ddd; }
-input, select { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 6px; font-size: 14px; }
-input:focus, select:focus { outline: none; border-color: #fa0a0a; }
-button[type="submit"], #submitDeposit, .print-receipt { margin-top: 20px; padding: 14px; background: #fa0a0a; color: white; border: none; width: 100%; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; }
-button[type="submit"]:hover, #submitDeposit:hover, .print-receipt:hover { background: #e00909; }
-button[disabled] { background: #666; cursor: not-allowed; }
-
-/* Status Messages */
-.status-message { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; display: none; }
-.status-success { background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid #22c55e; }
-.status-error { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
-.status-loading { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid #3b82f6; }
-
-/* Loading Spinner */
-.loading-spinner { border: 2px solid #333; border-top: 2px solid #fa0a0a; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
+
 </head>
 <body>
   <!-- Background video -->
@@ -61,43 +42,26 @@ button[disabled] { background: #666; cursor: not-allowed; }
   <!-- Header -->
   <header><img src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" alt="ShawnSweeps"></header>
 
-  <!-- Deposit Button -->
-  <button class="deposit-top" id="buy-button">Make a Deposit</button>
+  <!-- Social Media Buttons -->
+  <div class="social-buttons">
+    <a href="https://www.facebook.com/people/Shawn-Sweeps/61581214871852/" class="social-btn" target="_blank">
+      Facebook Page
+    </a>
+    <a href="https://www.facebook.com/shawn.shawn.927528" class="social-btn" target="_blank">
+      Facebook Profile
+    </a>
+    <a href="https://t.me/shawnsweeps" class="social-btn" target="_blank">
+      Telegram
+    </a>
+    <a href="https://api.whatsapp.com/send/?phone=%2B13463028043&text&type=phone_number&app_absent=0" class="social-btn" target="_blank">
+      WhatsApp
+    </a>
+  </div>
 
   <!-- Games -->
   <section id="games"></section>
 
-  <!-- Deposit Modal -->
-  <div id="depositModal">
-    <div class="modal-content" id="modalContent">
-      <button class="close-btn" onclick="closeModal()">&times;</button>
-      <h2 id="modalTitle">Deposit Funds</h2>
-      <div id="depositForm">
-        <label>Name *</label><input type="text" id="name" required>
-        <label>Email *</label><input type="email" id="email" required>
-        <label>Phone</label><input type="tel" id="phone">
-        <label>Game *</label><select id="game" required></select>
-        <label>Username *</label><input type="text" id="username" required>
-        <label>Deposit Amount ($) *</label><input type="number" id="amount" value="10" min="5" max="10000" required>
-        <button type="button" id="submitDeposit">Make Deposit</button>
-        <div id="statusMessage" class="status-message"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Wert SDK -->
-  <script src="https://widget.wert.io/wert-standalone.js"></script>
   <script>
-  const CONFIG = {
-    partner_id: "01K1T8VJJ8TY67M49FDXY865GF",
-    origin: "https://widget.wert.io",
-    extra: {
-      wallets: [
-        { name: "ETH", network: "Ethereum", address: "0x56283fef6678c663C2fFf1c806c377bA038E10Aa" }
-      ]
-    }
-  };
-
  // === Games Data ===
     const games = [
       { id: "megaspinsweeps", name: "Mega Spin Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://www.megaspinsweeps.com/index.html" },
@@ -150,129 +114,23 @@ button[disabled] { background: #666; cursor: not-allowed; }
       { id: "blackmamba", name: "Black Mamba", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/b99b4435.jpg?v=0c91e9dc", gameUrl: "https://blackmamba.mobi/" },
       { id: "playorca", name: "Play Orca", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a281d47e.jpg?v=0c91e9dc", gameUrl: "https://playorca.mobi/" },
       { id: "playbdd", name: "Play BDD", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/fcf9c9dd.jpg?v=0c91e9dc", gameUrl: "https://www.playbdd.com/" },
-      { id: "kraken", name: "The Kraken", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f6ee4ae8.jpg?v=0c91e9dc", gameUrl: "https://getthekraken.com/" }
+      { id: "kraken", name: "The Kraken", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f6ee4ae8.jpg?v=0c91e9dc", gameUrl: "https://getthekraken.com/" },
+      { id: "nova", name: "Nova", imageUrl: "https://sweepshub.us/IMG_2683.jpeg", gameUrl: "https://novaplay.cc/" },
+      { id: "funstation", name: "FunStation", imageUrl: "https://sweepshub.us/IMG_2663.jpeg", gameUrl: "https://www.funstation.site/" }
   ];
 
-  const nameEl = document.getElementById('name'),
-        emailEl = document.getElementById('email'),
-        phoneEl = document.getElementById('phone'),
-        gameEl = document.getElementById('game'),
-        userEl = document.getElementById('username'),
-        amountEl = document.getElementById('amount'),
-        submitBtn = document.getElementById('submitDeposit'),
-        depositModal = document.getElementById('depositModal'),
-        statusEl = document.getElementById('statusMessage'),
-        modalContent = document.getElementById('modalContent'),
-        modalTitle = document.getElementById('modalTitle'),
-        gamesEl = document.getElementById('games');
-
-  function generateClickId() {
-    return `shawnsweeps_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-  function showStatus(msg, type='loading') {
-    statusEl.className = `status-message status-${type}`;
-    statusEl.innerHTML = type === 'loading' ? `<span class="loading-spinner"></span>${msg}` : msg;
-    statusEl.style.display = 'block';
-  }
-  function validateForm() {
-    const name = nameEl.value.trim(), email = emailEl.value.trim(), username = userEl.value.trim(), amount = parseFloat(amountEl.value);
-    if (!name) return showStatus('Please enter your full name','error'), false;
-    if (!email.includes('@')) return showStatus('Please enter a valid email','error'), false;
-    if (!username) return showStatus('Please enter your game username','error'), false;
-    if (amount < 5) return showStatus('Minimum $5','error'), false;
-    if (amount > 10000) return showStatus('Maximum $10,000','error'), false;
-    return true;
-  }
-  function closeModal() { depositModal.style.display = 'none'; modalContent.innerHTML = originalModalHTML; }
-  function waitForWertSDK(max=50) {
-    return new Promise((res, rej) => {
-      let tries = 0;
-      (function check() {
-        if (window.WertWidget) return res();
-        if (++tries >= max) return rej(new Error('Wert SDK failed to load'));
-        setTimeout(check, 200);
-      })();
-    });
-  }
-
-  async function handleDeposit() {
-    if (!validateForm()) return;
-    const formData = {
-      name: nameEl.value.trim(),
-      email: emailEl.value.trim(),
-      phone: phoneEl.value.trim(),
-      game: gameEl.value,
-      username: userEl.value.trim(),
-      amount: parseFloat(amountEl.value)
-    };
-    const clickId = generateClickId();
-    showStatus('Initializing secure payment...','loading');
-    submitBtn.disabled = true;
-
-    try {
-      await waitForWertSDK();
-      const wertOptions = {
-        partner_id: CONFIG.partner_id,
-        origin: CONFIG.origin,
-        commodity: 'USD',
-        commodity_amount: formData.amount,
-        click_id: clickId,
-        user_email: formData.email,
-        user_name: formData.name,
-        extra: {
-          ...CONFIG.extra,
-          custom_params: {
-            game_selected: formData.game,
-            game_username: formData.username,
-            user_id: clickId,
-            source: 'shawnsweeps_website'
-          }
-        },
-        listeners: {
-          payment_status: (paymentData) => {
-            if (paymentData.status === 'success') {
-              modalContent.innerHTML = `
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-                <h2>Payment Successful</h2>
-                <div class="status-message status-success" style="display:block;">
-                  ✅ Payment Successful!<br>
-                  Transaction ID: <b>${paymentData.tx_id || paymentData.payment_id || 'N/A'}</b><br>
-                  Amount: $${formData.amount} USD<br>
-                  Game: ${formData.game}
-                </div>
-                <button class="print-receipt" onclick="window.print()">🖨 Print Receipt</button>
-              `;
-            } else if (paymentData.status === 'failed') {
-              showStatus('Payment failed. Please try again.','error');
-              submitBtn.disabled = false;
-            }
-          }
-        }
-      };
-      const wertWidget = new window.WertWidget(wertOptions);
-      wertWidget.open();
-    } catch (err) {
-      showStatus(`Failed to initialize payment: ${err.message}`,'error');
-      submitBtn.disabled = false;
-    }
-  }
+  const gamesEl = document.getElementById('games');
 
   function initializePage() {
+    // Create game cards
     games.forEach(g => {
       const card = document.createElement('div');
       card.className = 'game-card';
       card.innerHTML = `<a href="${g.gameUrl}" target="_blank"><img src="${g.imageUrl}" alt="${g.name}"></a>`;
       gamesEl.appendChild(card);
-      const opt = document.createElement('option');
-      opt.value = g.name; opt.textContent = g.name; gameEl.appendChild(opt);
     });
-    document.getElementById('buy-button').onclick = () => depositModal.style.display = 'flex';
-    submitBtn.onclick = handleDeposit;
-    depositModal.onclick = e => { if (e.target === depositModal) closeModal(); };
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
   }
 
-  const originalModalHTML = modalContent.innerHTML;
   initializePage();
   </script>
 </body>
