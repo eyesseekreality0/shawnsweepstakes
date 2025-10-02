@@ -5,50 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ShawnSweeps</title>
 <style>
-/* === Reset & Layout === */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body, html { width: 100%; min-height: 100vh; overflow-x: hidden; font-family: Arial, sans-serif; color: white; }
-
-/* Video Background */
-#bg-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
-.video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: -1; }
-
-/* Header */
-header { text-align: center; margin: 30px 0 20px; position: relative; z-index: 10; }
-header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
-
-/* Social Media Buttons */
-.social-buttons { display: flex; justify-content: center; gap: 15px; margin: 20px 0 40px; flex-wrap: wrap; position: relative; z-index: 10; }
-.social-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; background: rgba(250, 10, 10, 0.9); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(250, 10, 10, 0.3); min-width: 140px; text-align: center; }
-.social-btn:hover { background: rgba(224, 9, 9, 0.9); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(250, 10, 10, 0.4); }
-.social-btn i { font-size: 18px; }
-
-/* Deposit Button */
-#depositBtn {
+/* your styles here (same as before) */
+.deposit-btn {
   display: block;
-  margin: 0 auto 30px;
-  padding: 14px 24px;
-  background: linear-gradient(90deg, #ff3b3b, #ff6a00);
+  margin: 20px auto;
+  padding: 15px 30px;
+  background: rgba(250, 10, 10, 0.9);
   color: white;
-  font-weight: bold;
-  font-size: 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
+  transition: all 0.3s;
 }
-#depositBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 18px rgba(255, 50, 50, 0.5);
+.deposit-btn:hover {
+  background: rgba(224, 9, 9, 0.9);
+  transform: translateY(-2px);
 }
-
-/* Game Grid */
-#games { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto 60px; padding: 0 15px; position: relative; z-index: 10; }
-@media (max-width: 1024px) { #games { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 500px) { #games { grid-template-columns: repeat(2, 1fr); } }
-.game-card { position: relative; width: 100%; padding-bottom: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.5); transition: all 0.3s; }
-.game-card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.game-card:hover { transform: scale(1.1); box-shadow: 0 0 25px rgba(250,10,10,0.6); }
 </style>
 </head>
 <body>
@@ -60,7 +34,7 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
   <header><img src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" alt="ShawnSweeps"></header>
 
   <!-- Deposit Button -->
-  <button id="depositBtn">💰 Deposit</button>
+  <button id="depositBtn" class="deposit-btn">💳 Deposit</button>
 
   <!-- Social Media Buttons -->
   <div class="social-buttons">
@@ -74,27 +48,7 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
   <section id="games"></section>
 
   <script>
-    // Handle Deposit Button
-    document.getElementById("depositBtn").addEventListener("click", async () => {
-      try {
-        const res = await fetch("/api/deposit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: 50 }) // Example amount
-        });
-        const data = await res.json();
-        if (data.checkoutUrl) {
-          window.location.href = data.checkoutUrl;
-        } else {
-          alert("Error creating deposit: " + (data.error || "Unknown error"));
-        }
-      } catch (err) {
-        alert("Failed to connect to API: " + err.message);
-      }
-    });
-
-    // === Games Data (unchanged) ===
-    const games = [ 
+  const games = [
       { id: "megaspinsweeps", name: "Mega Spin Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://www.megaspinsweeps.com/index.html" },
       { id: "vblink777", name: "VBLink777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/753a32c3.jpg?v=0c91e9dc", gameUrl: "https://www.vblink777.club/" },
       { id: "goldentreasure", name: "Golden Treasure", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/7c9b03e5.jpg?v=0c91e9dc", gameUrl: "https://www.goldentreasure.mobi/" },
@@ -147,15 +101,40 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
       { id: "playbdd", name: "Play BDD", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/fcf9c9dd.jpg?v=0c91e9dc", gameUrl: "https://www.playbdd.com/" },
       { id: "kraken", name: "The Kraken", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f6ee4ae8.jpg?v=0c91e9dc", gameUrl: "https://getthekraken.com/" },
       { id: "nova", name: "Nova", imageUrl: "https://sweepshub.us/IMG_2683.jpeg", gameUrl: "https://novaplay.cc/" },
-      { id: "funstation", name: "FunStation", imageUrl: "https://sweepshub.us/IMG_2663.jpeg", gameUrl: "https://www.funstation.site/" }];
+      { id: "funstation", name: "FunStation", imageUrl: "https://sweepshub.us/IMG_2663.jpeg", gameUrl: "https://www.funstation.site/" }];];
 
-    const gamesEl = document.getElementById('games');
+  const gamesEl = document.getElementById('games');
+  function initializePage() {
     games.forEach(g => {
       const card = document.createElement('div');
       card.className = 'game-card';
       card.innerHTML = `<a href="${g.gameUrl}" target="_blank"><img src="${g.imageUrl}" alt="${g.name}"></a>`;
       gamesEl.appendChild(card);
     });
+  }
+  initializePage();
+
+  // Deposit button logic
+  document.getElementById("depositBtn").addEventListener("click", async () => {
+    try {
+      const resp = await fetch("/api/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: 50 }) // test with $50 deposit
+      });
+      const data = await resp.json();
+
+      if (data.checkoutLink) {
+        window.location.href = data.checkoutLink;
+      } else if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert("Error: " + JSON.stringify(data.error || data));
+      }
+    } catch (err) {
+      alert("Failed to call API: " + err.message);
+    }
+  });
   </script>
 </body>
 </html>
