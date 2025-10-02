@@ -22,8 +22,25 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
 .social-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; background: rgba(250, 10, 10, 0.9); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(250, 10, 10, 0.3); min-width: 140px; text-align: center; }
 .social-btn:hover { background: rgba(224, 9, 9, 0.9); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(250, 10, 10, 0.4); }
 .social-btn i { font-size: 18px; }
-@media (max-width: 768px) { .social-buttons { gap: 12px; padding: 0 20px; } .social-btn { min-width: calc(50% - 6px); padding: 14px 16px; font-size: 13px; } }
-@media (max-width: 480px) { .social-buttons { gap: 10px; padding: 0 15px; } .social-btn { min-width: calc(50% - 5px); padding: 16px 12px; font-size: 12px; } }
+
+/* Deposit Button */
+#depositBtn {
+  display: block;
+  margin: 0 auto 30px;
+  padding: 14px 24px;
+  background: linear-gradient(90deg, #ff3b3b, #ff6a00);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+#depositBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(255, 50, 50, 0.5);
+}
 
 /* Game Grid */
 #games { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto 60px; padding: 0 15px; position: relative; z-index: 10; }
@@ -33,7 +50,6 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
 .game-card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .game-card:hover { transform: scale(1.1); box-shadow: 0 0 25px rgba(250,10,10,0.6); }
 </style>
-
 </head>
 <body>
   <!-- Background video -->
@@ -43,28 +59,42 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
   <!-- Header -->
   <header><img src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" alt="ShawnSweeps"></header>
 
+  <!-- Deposit Button -->
+  <button id="depositBtn">💰 Deposit</button>
+
   <!-- Social Media Buttons -->
   <div class="social-buttons">
-    <a href="https://www.facebook.com/people/Shawn-Sweeps/61581214871852/" class="social-btn" target="_blank">
-      Facebook Page
-    </a>
-    <a href="https://www.facebook.com/shawn.shawn.927528" class="social-btn" target="_blank">
-      Facebook Profile
-    </a>
-    <a href="https://t.me/shawnsweeps" class="social-btn" target="_blank">
-      Telegram
-    </a>
-    <a href="https://api.whatsapp.com/send/?phone=%2B13463028043&text&type=phone_number&app_absent=0" class="social-btn" target="_blank">
-      WhatsApp
-    </a>
+    <a href="https://www.facebook.com/people/Shawn-Sweeps/61581214871852/" class="social-btn" target="_blank">Facebook Page</a>
+    <a href="https://www.facebook.com/shawn.shawn.927528" class="social-btn" target="_blank">Facebook Profile</a>
+    <a href="https://t.me/shawnsweeps" class="social-btn" target="_blank">Telegram</a>
+    <a href="https://api.whatsapp.com/send/?phone=%2B13463028043&text&type=phone_number&app_absent=0" class="social-btn" target="_blank">WhatsApp</a>
   </div>
 
   <!-- Games -->
   <section id="games"></section>
 
   <script>
- // === Games Data ===
-    const games = [
+    // Handle Deposit Button
+    document.getElementById("depositBtn").addEventListener("click", async () => {
+      try {
+        const res = await fetch("/api/deposit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: 50 }) // Example amount
+        });
+        const data = await res.json();
+        if (data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          alert("Error creating deposit: " + (data.error || "Unknown error"));
+        }
+      } catch (err) {
+        alert("Failed to connect to API: " + err.message);
+      }
+    });
+
+    // === Games Data (unchanged) ===
+    const games = [ 
       { id: "megaspinsweeps", name: "Mega Spin Sweeps", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/85307f95.jpg?v=0c91e9dc", gameUrl: "http://www.megaspinsweeps.com/index.html" },
       { id: "vblink777", name: "VBLink777", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/753a32c3.jpg?v=0c91e9dc", gameUrl: "https://www.vblink777.club/" },
       { id: "goldentreasure", name: "Golden Treasure", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/7c9b03e5.jpg?v=0c91e9dc", gameUrl: "https://www.goldentreasure.mobi/" },
@@ -117,22 +147,15 @@ header img { width: 220px; filter: drop-shadow(0 0 10px rgba(250,10,10,0.6)); }
       { id: "playbdd", name: "Play BDD", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/fcf9c9dd.jpg?v=0c91e9dc", gameUrl: "https://www.playbdd.com/" },
       { id: "kraken", name: "The Kraken", imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f6ee4ae8.jpg?v=0c91e9dc", gameUrl: "https://getthekraken.com/" },
       { id: "nova", name: "Nova", imageUrl: "https://sweepshub.us/IMG_2683.jpeg", gameUrl: "https://novaplay.cc/" },
-      { id: "funstation", name: "FunStation", imageUrl: "https://sweepshub.us/IMG_2663.jpeg", gameUrl: "https://www.funstation.site/" }
-  ];
+      { id: "funstation", name: "FunStation", imageUrl: "https://sweepshub.us/IMG_2663.jpeg", gameUrl: "https://www.funstation.site/" }];
 
-  const gamesEl = document.getElementById('games');
-
-  function initializePage() {
-    // Create game cards
+    const gamesEl = document.getElementById('games');
     games.forEach(g => {
       const card = document.createElement('div');
       card.className = 'game-card';
       card.innerHTML = `<a href="${g.gameUrl}" target="_blank"><img src="${g.imageUrl}" alt="${g.name}"></a>`;
       gamesEl.appendChild(card);
     });
-  }
-
-  initializePage();
   </script>
 </body>
 </html>
